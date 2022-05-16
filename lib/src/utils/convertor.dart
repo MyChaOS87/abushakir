@@ -12,12 +12,12 @@ String _convert_1_2_10_to_ethiopic(int num) {
     throw new EthiopicNumberException(
         "Zero (0) and Negative numbers doesn't exsit in Ethiopic numerals");
   }
-  return geezNumbers[num];
+  return geezNumbers[num]!;
 }
 
 String _convert_11_2_100_to_ethiopic(int num) {
   if (num == 100) {
-    return geezNumbers[num];
+    return geezNumbers[num]!;
   } else {
     var result = _divide(10, num);
     return result[1] > 0
@@ -78,4 +78,7 @@ String ConvertToEthiopic(int num) {
 
     return "${left}${geezNumbers[100]}${right}";
   }
+
+  throw new EthiopicNumberException(
+      "Numbers larger than 10000 are not yet supported");
 }

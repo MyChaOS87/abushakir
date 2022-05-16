@@ -112,7 +112,7 @@ class EtDatetime extends EDT {
   /// ```
   ///
   EtDatetime(
-      {int year,
+      {required int year,
       int month = 1,
       int day = 1,
       int hour = 0,
@@ -122,9 +122,7 @@ class EtDatetime extends EDT {
       int microsecond = 0})
       : fixed = _fixedFromEthiopic(year, month, day),
         moment =
-            _dateToEpoch(year, month, day, hour, minute, second, millisecond) {
-    if (fixed == null) throw ArgumentError();
-  }
+            _dateToEpoch(year, month, day, hour, minute, second, millisecond) {}
 
   ///
   /// Constructs an [EtDatetime] instance with current date and time.
@@ -148,7 +146,6 @@ class EtDatetime extends EDT {
   EtDatetime.fromMillisecondsSinceEpoch(int millisecondsSinceEpoch)
       : moment = millisecondsSinceEpoch,
         fixed = _fixedFromUnix(millisecondsSinceEpoch) {
-    if (fixed == null) throw ArgumentError();
     if (millisecondsSinceEpoch.abs() > _maxMillisecondsSinceEpoch ||
         (millisecondsSinceEpoch.abs() == _maxMillisecondsSinceEpoch)) {
       throw ArgumentError(
@@ -196,14 +193,14 @@ class EtDatetime extends EDT {
   ///
   static EtDatetime parse(String formattedString) {
     var re = _parseFormat;
-    Match match = re.firstMatch(formattedString);
+    Match? match = re.firstMatch(formattedString);
     if (match != null) {
-      int parseIntOrZero(String matched) {
+      int parseIntOrZero(String? matched) {
         if (matched == null) return 0;
         return int.parse(matched);
       }
 
-      int parseMilliAndMicroseconds(String matched) {
+      int parseMilliAndMicroseconds(String? matched) {
         if (matched == null) return 0;
         int length = matched.length;
         assert(length >= 1);
@@ -217,9 +214,9 @@ class EtDatetime extends EDT {
         return result;
       }
 
-      int years = int.parse(match[1]);
-      int month = int.parse(match[2]);
-      int day = int.parse(match[3]);
+      int years = int.parse(match[1]!);
+      int month = int.parse(match[2]!);
+      int day = int.parse(match[3]!);
       int hour = parseIntOrZero(match[4]);
       int minute = parseIntOrZero(match[5]);
       int second = parseIntOrZero(match[6]);
@@ -231,7 +228,7 @@ class EtDatetime extends EDT {
         if (match[9] != null) {
           // timezone other than 'Z' and 'z'.
           int sign = (match[9] == '-') ? -1 : 1;
-          int hourDifference = int.parse(match[10]);
+          int hourDifference = int.parse(match[10]!);
           int minuteDifference = parseIntOrZero(match[11]);
           minuteDifference += 60 * hourDifference;
           minute -= sign * minuteDifference;
@@ -240,9 +237,7 @@ class EtDatetime extends EDT {
       int value =
           _dateToEpoch(years, month, day, hour, minute, second, millisecond);
       int fixedValue = _fixedFromEthiopic(years, month, day);
-      if (value == null) {
-        throw FormatException("Time out of range", formattedString);
-      }
+
       return EtDatetime._withValue(value, fixedValue);
     } else {
       throw FormatException("Invalid date format", formattedString);
@@ -255,7 +250,7 @@ class EtDatetime extends EDT {
   /// Works like [parse] except that this function returns `null`
   /// where [parse] would throw a [FormatException].
   ///
-  static EtDatetime tryParse(String formattedString) {
+  static EtDatetime? tryParse(String formattedString) {
     try {
       return parse(formattedString);
     } on FormatException {
@@ -687,7 +682,7 @@ class EtDatetime extends EDT {
       r'( ?[zZ]| ?([-+])(\d\d)(?::?(\d\d))?)?)?$');
 
   @override
-  List<Object> get props => null;
+  List<Object> get props => [];
 
   @override
   bool get stringify => true;

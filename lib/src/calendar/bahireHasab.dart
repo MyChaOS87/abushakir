@@ -4,6 +4,13 @@
 
 part of abushakir;
 
+class _monthDateStruct {
+  final String month;
+  final int date;
+
+  _monthDateStruct(this.month, this.date) {}
+}
+
 ///
 ///
 /// "Bahire Hasab /'bəhrɛ həsəb'/  " simply means "An age with a descriptive
@@ -47,7 +54,7 @@ part of abushakir;
 ///
 ///
 class BahireHasab extends Equatable {
-  int _year;
+  late final int _year;
 
   BahireHasab({int year = -1}) {
     year < 0 ? _year = EtDatetime.now().year : _year = year;
@@ -161,11 +168,17 @@ class BahireHasab extends Equatable {
   /// MebajaHamer = Metikih + Ye'elet Tewsak // የእለት ተውሳክ
   ///```
   ///
+
   Map<String, dynamic> get nenewe {
+    var nenewe = _nenewe;
+    return {"month": nenewe.month, "date": nenewe.date};
+  }
+
+  _monthDateStruct get _nenewe {
     String meskerem1 = getMeskeremOne(returnName: true);
     int month = yebealeMetkihWer();
     int date;
-    int dayTewsak;
+    late int dayTewsak;
     _yeeletTewsak.forEach((el) => {
           if (el['key'] ==
               _weekdays[(_weekdays.indexOf(meskerem1) + metkih - 1) % 7])
@@ -184,7 +197,7 @@ class BahireHasab extends Equatable {
           });
     }
     date = metkih + dayTewsak;
-    return {"month": monthName, "date": date % 30 == 0 ? 30 : date % 30};
+    return _monthDateStruct(monthName, date % 30 == 0 ? 30 : date % 30);
   }
 
   ///
@@ -198,17 +211,18 @@ class BahireHasab extends Equatable {
   /// ```
   ///
   List get allAtswamat {
-    Map<String, dynamic> mebajaHamer = nenewe;
-    List result = List();
+    _monthDateStruct mebajaHamer = _nenewe;
+    List result = [];
+    ;
     _yebealTewsak.forEach((beal, numOfDays) {
       result.add({
         "beal": beal,
         "day": {
-          "month": _months[_months.indexOf(mebajaHamer['month']) +
-              (mebajaHamer['date'] + numOfDays) ~/ 30],
-          "date": (mebajaHamer['date'] + numOfDays) % 30 == 0
+          "month": _months[_months.indexOf(mebajaHamer.month) +
+              (mebajaHamer.date + numOfDays) ~/ 30],
+          "date": (mebajaHamer.date + numOfDays) % 30 == 0
               ? 30
-              : (mebajaHamer['date'] + numOfDays) % 30
+              : (mebajaHamer.date + numOfDays) % 30
         }
       });
     });
@@ -238,18 +252,18 @@ class BahireHasab extends Equatable {
   /// ```
   ///
   Map<String, dynamic> getSingleBealOrTsom(String name) {
-    Map<String, dynamic> a;
+    Map<String, dynamic> a = {};
     try {
       bool status = isMovableHoliday(name);
       if (status) {
-        Map<String, dynamic> mebajaHamer = nenewe;
-        int target = _yebealTewsak[name];
+        _monthDateStruct mebajaHamer = _nenewe;
+        int target = _yebealTewsak[name]!;
         a = {
-          "month": _months[_months.indexOf(mebajaHamer['month']) +
-              ((mebajaHamer['date'] + target) ~/ 30)],
-          "date": (mebajaHamer['date'] + target) % 30 == 0
+          "month": _months[_months.indexOf(mebajaHamer.month) +
+              ((mebajaHamer.date + target) ~/ 30)],
+          "date": (mebajaHamer.date + target) % 30 == 0
               ? 30
-              : (mebajaHamer['date'] + target) % 30
+              : (mebajaHamer.date + target) % 30
         };
       }
     } catch (e) {
